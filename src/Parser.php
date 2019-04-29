@@ -26,7 +26,7 @@ class Parser {
 	/**
 	 * @const string
 	 */
-	protected const IT_YIELD = 'yield';
+	protected const CT_YIELD = 'yield';
 
 	/**
 	 * @param File $Source
@@ -51,10 +51,10 @@ class Parser {
 			 * the special syntax be wrapped by comments.
 			 */
 			if ($Parsed[0] == T_COMMENT
-				&& preg_match('/\/\*<%(yield)(?::([A-Za-z0-9_-]+))?%>\*\//', $Parsed[1], $Data)) {
+				&& preg_match('/\/\*[\s*]*<%([A-Za-z][A-Za-z0-9_]+)(?::([A-Za-z0-9_-]+))?%>[\s*]*\*\//', $Parsed[1], $Data)) {
 
 					switch (strtolower($Data[1])){
-						case self::IT_YIELD:
+						case self::CT_YIELD:
 							if (!isset(self::$Resolvers[$Data[2]])) {
 								throw new \Exception(sprintf('Undefined resolver: %s!', $Data[2]));
 							}
