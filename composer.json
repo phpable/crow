@@ -1,0 +1,25 @@
+{
+	"name": "able/crow",
+	"type": "library",
+	"keywords": ["phpable", "code-injections", "engine"],
+	"description": "phpABLE code-injections engine",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Kassius Kress",
+			"email": "hacpaka@kamora.vn"
+		}
+	],
+	"require": {
+		"php": ">=7.4.0",
+		"able/prototypes": "dev-master",
+		"able/helpers": "dev-master"
+	},
+	"autoload": {
+		"psr-4": {
+			"Able\\Sabre\\": "src/"
+		}
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true
+}
