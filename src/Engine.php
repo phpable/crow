@@ -80,17 +80,33 @@ class Engine {
 		$this->Cache = Arr::place($this->Cache, $Consumer, 'class', $class, $Consumer->name());
 	}
 
-//	protected final function compileClass(string $name, CFunction $Consumer): Generator {
-//		if ($Consumer->name != '@anonymous') {
-//			yield sprintf("class %s {\n", $name);
-//		}
-//
-//		foreach ($Signature as $Comsumer) {
-//			yield from $Comsumer->iterate();
-//		}
-//
-//		yield "\n}\n";
-//	}
+	/**
+	 * @param string $name
+	 * @return Generator
+	 *
+	 * @throws Exception
+	 */
+	protected final function combineClass(string $name): Generator {
+		if (!Regex::checkVariable($name)) {
+			throw new Exception(sprintf('Invalid class name: %s!',
+				$name));
+
+		}
+
+		if (is_null($Signature = Arr::follow($this->Cache, 'class', $name))) {
+			throw new Exception(sprintf('Undefined class name: %s!',
+				$name));
+
+		}
+
+		yield sprintf("class %s {\n", $name);
+
+		foreach ($Signature as $Comsumer) {
+			yield from $Comsumer->iterate();
+		}
+
+		yield "\n}\n";
+	}
 
 	/**
 	 * @return Generator
@@ -107,8 +123,8 @@ class Engine {
 				 * The queue is gonna be linked into a single file,
 				 * so any opening or closing tags have to be ignored.
 				 */
-				if (in_array(trim($Parsed[1]), [
-					'<?php', '<?=', '?>'])) {
+				if (is_array($Parsed)
+					&& in_array(trim($Parsed[1]), ['<?php', '<?=', '?>'])) {
 
 						continue;
 				}
@@ -151,7 +167,7 @@ class Engine {
 							continue 2;
 
 						case self::CT_CLASS:
-							_dumpe($Data);
+							yield from $this->combineClass($Data[2]);
 							continue 2;
 					}
 				}
@@ -159,9 +175,5 @@ class Engine {
 				yield $Parsed[1];
 			}
 		}
-//
-//		foreach (Arr::get($this->Cache, 'class', []) as $name => $Signature) {
-//			yield from $this->compileClass($name, $Signature);
-//		}
 	}
 }
