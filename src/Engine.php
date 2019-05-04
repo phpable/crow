@@ -16,7 +16,7 @@ use \Able\Reglib\Regex;
 use \Exception;
 use \Generator;
 
-class Parser {
+class Engine {
 
 	/**
 	 * @const string
