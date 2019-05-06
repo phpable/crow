@@ -34,6 +34,11 @@ class Engine {
 	protected const CT_CLASS = 'class';
 
 	/**
+	 * @const string
+	 */
+	protected const CT_ANONYMOUS = 'anonymous';
+
+	/**
 	 * @var callable[]
 	 */
 	private static array $Resolvers = [];
@@ -109,6 +114,28 @@ class Engine {
 	}
 
 	/**
+	 * @param string $variable
+	 * @return Generator
+	 *
+	 * @throws Exception
+	 */
+	protected final function combineAnonymous(string $variable): Generator {
+		if (is_null($Signature = Arr::follow($this->Cache, 'class', '@anonymous'))) {
+			throw new Exception(sprintf('Undefined class name: %s!',
+				$name));
+
+		}
+
+		yield sprintf("\$%s = new class {\n", $variable);
+
+		foreach ($Signature as $Comsumer) {
+			yield from $Comsumer->iterate();
+		}
+
+		yield "\n};\n";
+	}
+
+	/**
 	 * @return Generator
 	 * @throws Exception
 	 */
@@ -168,6 +195,10 @@ class Engine {
 
 						case self::CT_CLASS:
 							yield from $this->combineClass($Data[2]);
+							continue 2;
+
+						case self::CT_ANONYMOUS:
+							yield from $this->combineAnonymous($Data[2]);
 							continue 2;
 					}
 				}
