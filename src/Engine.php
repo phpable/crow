@@ -41,14 +41,14 @@ class Engine {
 	/**
 	 * @var callable[]
 	 */
-	private array $Resolvers = [];
+	private static array $Resolvers = [];
 
 	/**
 	 * @param string $name
 	 * @param callable $Handler
 	 */
 	public final function resolve(string $name, callable $Handler): void {
-		$this->Resolvers[$name] = $Handler;
+		self::$Resolvers[$name] = $Handler;
 	}
 
 	/**
@@ -79,7 +79,8 @@ class Engine {
 		if (!is_null(Arr::follow($this->Cache,
 			'class', $class = Src::tcm($class), $Consumer->name()))) {
 
-				throw new Exception(sprintf('Method %s is duplicated for class %s', $Consumer->name(), $class));
+				throw new Exception(sprintf('Method %s is duplicated for class %s',
+					$Consumer->name(), $class));
 		}
 
 		$this->Cache = Arr::place($this->Cache, $Consumer, 'class', $class, $Consumer->name());
@@ -186,7 +187,7 @@ class Engine {
 					switch (strtolower($Data[1])) {
 						case self::CT_YIELD:
 							if (!isset(self::$Resolvers[$Data[2]])) {
-								throw new \Exception(sprintf('Undefined resolver: %s!', $Data[2]));
+								throw new Exception(sprintf('Undefined resolver: %s!', $Data[2]));
 							}
 
 							yield from self::$Resolvers[$Data[2]]();
