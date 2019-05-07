@@ -196,7 +196,7 @@ class Engine {
 							if (!Regex::checkVariable($Data[2])
 								&& $Data[2] != '@anonymous') {
 
-									throw new Exception(sprintf('Invalid calss name: %s', $Data[2]));
+									throw new Exception(sprintf('Invalid class name: %s', $Data[2]));
 							}
 
 							$this->cacheMethod($Data[2],
