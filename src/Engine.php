@@ -41,14 +41,14 @@ class Engine {
 	/**
 	 * @var callable[]
 	 */
-	private static array $Resolvers = [];
+	private array $Resolvers = [];
 
 	/**
 	 * @param string $name
 	 * @param callable $Handler
 	 */
-	public static final function resolve(string $name, callable $Handler): void {
-		self::$Resolvers[$name] = $Handler;
+	public final function resolve(string $name, callable $Handler): void {
+		$this->Resolvers[$name] = $Handler;
 	}
 
 	/**
@@ -136,10 +136,21 @@ class Engine {
 	}
 
 	/**
+	 * @param File|null $File
 	 * @return Generator
+	 *
 	 * @throws Exception
 	 */
-	public function parse(): Generator {
+	public function parse(?File $File = null): Generator {
+
+		/**
+		 * This Is the special case and the short function call mostly.
+		 * Works pretty good if the only one file is needed to be processed.
+		 */
+		if (!is_null($File)) {
+			$this->register($File);
+		}
+
 		foreach ($this->Queue as $File) {
 			$Tokens = token_get_all($File->getContent(), TOKEN_PARSE);
 
