@@ -106,7 +106,6 @@ class Engine {
 	 * @throws Exception
 	 */
 	public function parse(?File $File = null): Generator {
-
 		/**
 		 * This Is the special case and the short function call mostly.
 		 * Works pretty good if the only one file is needed to be processed.
