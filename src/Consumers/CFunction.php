@@ -87,6 +87,14 @@ class CFunction extends AConsumer {
 				&& $opened
 				&& $brackets < 1) {
 
+					while (count($Tokens) > 0
+
+						&& is_array($Tokens[0])
+						&& $Tokens[0][0] == T_WHITESPACE) {
+
+							array_shift($Tokens);
+					}
+
 					break;
 			}
 		}
