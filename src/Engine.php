@@ -121,11 +121,20 @@ class Engine {
 				$Parsed = array_shift($Tokens);
 
 				/**
+				 * The injection engine is focused around PHP syntax only,
+				 * so none close tags are allowed.
+				 */
+				if (is_array($Parsed)
+					&& $Parsed[0] == T_CLOSE_TAG) {
+						throw new Exception('No closing tags are allowed!');
+				}
+
+				/**
 				 * The queue is gonna be linked into a single file,
 				 * so any opening or closing tags have to be ignored.
 				 */
 				if (is_array($Parsed)
-					&& in_array(trim($Parsed[1]), ['<?php', '<?=', '?>'])) {
+					&& in_array($Parsed[0], [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO])) {
 
 						continue;
 				}
