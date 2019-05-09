@@ -4,6 +4,7 @@ namespace Able\Crow;
 use \Able\Crow\Abstractions\AConsumer;
 use \Able\Crow\Consumers\CFunction;
 
+use Able\Crow\Utilities\StringBuffer;
 use \Able\Helpers\Arr;
 use \Able\Helpers\Src;
 
@@ -11,6 +12,7 @@ use \Able\IO\Path;
 use \Able\IO\File;
 use \Able\IO\Directory;
 
+use \Able\IO\WritingBuffer;
 use \Able\Reglib\Regex;
 
 use \Exception;
@@ -106,6 +108,8 @@ class Engine {
 	 * @throws Exception
 	 */
 	public function parse(?File $File = null): Generator {
+		$Buffer = new StringBuffer();
+
 		/**
 		 * This Is the special case and the short function call mostly.
 		 * Works pretty good if the only one file is needed to be processed.
@@ -144,7 +148,7 @@ class Engine {
 				 * without any reformation.
 				 */
 				if (!is_array($Parsed)) {
-					yield $Parsed;
+					$Buffer->write($Parsed);
 					continue;
 				}
 
@@ -161,7 +165,7 @@ class Engine {
 								throw new Exception(sprintf('Undefined resolver: %s!', $Data[2]));
 							}
 
-							yield from self::$Resolvers[$Data[2]]();
+							$Buffer->consume(self::$Resolvers[$Data[2]]());
 							continue 2;
 
 						case self::CT_TO_CLASS:
@@ -177,7 +181,7 @@ class Engine {
 							continue 2;
 
 						case self::CT_CLASS:
-							yield from $this->combineMethods($Data[2]);
+							$Buffer->consume($this->combineMethods($Data[2]));
 							continue 2;
 
 						default:
@@ -185,8 +189,11 @@ class Engine {
 					}
 				}
 
-				yield $Parsed[1];
+				$Buffer->write($Parsed[1]);
 			}
 		}
+
+		return $Buffer->iterate();
+//		return implode("", $Buffer);
 	}
 }
