@@ -67,20 +67,26 @@ class Engine {
 	private array $Cache = [];
 
 	/**
-	 * @param string $class
+	 * @param string $tag
 	 * @param CFunction $Consumer
 	 *
 	 * @throws Exception
 	 */
-	protected final function cacheMethod(string $class, CFunction $Consumer): void {
-		if (!is_null(Arr::follow($this->Cache,
-			'class', $class = Src::tcm($class), $Consumer->name()))) {
+	protected final function cacheMethod(string $tag, CFunction $Consumer): void {
+		if (!Regex::checkVariable($tag)
+			&& $Data[2] != '@anonymous') {
 
-				throw new Exception(sprintf('Method %s is duplicated for class %s',
-					$Consumer->name(), $class));
+				throw new Exception(sprintf('Invalid class name: %s', $tag));
 		}
 
-		$this->Cache = Arr::place($this->Cache, $Consumer, 'class', $class, $Consumer->name());
+		if (!is_null(Arr::follow($this->Cache,
+			'class', $tag = Src::tcm($tag), $Consumer->name()))) {
+
+				throw new Exception(sprintf('Method %s is duplicated for class %s',
+					$Consumer->name(), $tag));
+		}
+
+		$this->Cache = Arr::place($this->Cache, $Consumer, 'class', $tag, $Consumer->name());
 	}
 
 	/**
@@ -130,6 +136,7 @@ class Engine {
 				 */
 				if (is_array($Parsed)
 					&& $Parsed[0] == T_CLOSE_TAG) {
+
 						throw new Exception('No closing tags are allowed!');
 				}
 
@@ -169,12 +176,6 @@ class Engine {
 							continue 2;
 
 						case self::CT_TO_CLASS:
-							if (!Regex::checkVariable($Data[2])
-								&& $Data[2] != '@anonymous') {
-
-									throw new Exception(sprintf('Invalid class name: %s', $Data[2]));
-							}
-
 							$this->cacheMethod($Data[2],
 								(new CFunction())->consume($Tokens));
 
