@@ -194,6 +194,5 @@ class Engine {
 		}
 
 		return $Buffer->iterate();
-//		return implode("", $Buffer);
 	}
 }
